@@ -1,0 +1,72 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0c0c0e;
+    color: #e3e3e7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0; padding: 30px;
+    box-sizing: border-box;
+}
+
+.hub-clock { font-size: 3.5rem; font-weight: bold; color: #ffffff; margin-bottom: 25px; letter-spacing: 2px; }
+
+.weather-card {
+    background-color: #16161a; padding: 50px 60px 80px 60px; border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7); text-align: center;
+    width: 100%; max-width: 1250px; box-sizing: border-box; border: 1px solid #222226; position: relative;
+}
+
+.search-box { display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; max-width: 500px; margin: 0 auto 30px auto; }
+.search-box input { flex: 1; padding: 12px 20px; border: 2px solid #333339; background-color: #222227; color: #ffffff; border-radius: 30px; font-size: 1.2rem; outline: none; }
+.search-box input:focus { border-color: #8ab4f8; }
+.search-box button { background-color: #8ab4f8; color: #0c0c0e; border: none; padding: 12px 25px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; }
+
+#weather-content { display: flex; flex-direction: row; gap: 50px; align-items: center; justify-content: center; }
+.current-section { flex: 1; text-align: center; }
+h2 { margin: 0 0 15px 0; color: #ffffff; font-size: 2.6rem; font-weight: bold; }
+.emoji-icon { font-size: 7.5rem; margin: 5px 0; display: block; }
+.temp { font-size: 7.5rem; font-weight: bold; margin: 5px 0; color: #8ab4f8; }
+.hl { font-size: 2rem; font-weight: bold; color: #a3a3a8; margin-bottom: 20px; }
+.hi { color: #f28b82; } .lo { color: #8ab4f8; }
+.desc { text-transform: capitalize; color: #a3a3a8; margin-bottom: 30px; font-size: 2rem; font-weight: bold; }
+.details { display: flex; justify-content: space-around; font-size: 1.8rem; color: #a3a3a8; background-color: #1d1d23; padding: 15px; border-radius: 14px; max-width: 500px; margin: 0 auto; }
+
+.forecast-section { flex: 1.3; }
+.forecast-title { text-align: left; font-size: 2.2rem; font-weight: bold; margin-bottom: 20px; color: #ffffff; }
+.forecast-grid { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 15px !important; width: 100%; margin-bottom: 25px; }
+.forecast-day { background-color: #1d1d23; padding: 25px 15px; border-radius: 14px; font-size: 1.8rem; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #282830; gap: 10px; }
+.forecast-day .day-name { font-weight: bold; color: #ffffff; }
+.forecast-day .day-emoji { font-size: 2.5rem; }
+.forecast-day .day-temps { font-weight: bold; color: #a3a3a8; }
+
+.graph-section { width: 100%; background-color: #1d1d23; padding: 20px; border-radius: 14px; border: 1px solid #282830; box-sizing: border-box; }
+.graph-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: #a3a3a8; text-align: left; }
+.canvas-container { width: 100%; height: 160px; position: relative; }
+#line-graph-canvas { width: 100%; height: 100%; display: block; }
+
+/* Bottom Action Bar Alignment Anchors */
+.action-bar-left { position: absolute; bottom: 15px; left: 20px; display: flex; gap: 10px; }
+.action-bar-right { position: absolute; bottom: 15px; right: 20px; display: flex; align-items: center; gap: 12px; }
+
+.screen-action-btn { background-color: #222227; color: #c5c5ca; border: 1px solid #333339; padding: 6px 14px; font-size: 0.85rem; font-weight: bold; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+.screen-action-btn:hover { background-color: #333339; color: #ffffff; }
+
+/* Glowing Feedback Styles for the Manual Trigger */
+.update-btn { border-color: #8ab4f8; color: #8ab4f8; }
+.update-btn:hover { background-color: #8ab4f8; color: #0c0c0e; box-shadow: 0 0 10px rgba(138,180,248,0.3); }
+
+.timer-countdown { font-size: 0.85rem; color: #a3a3a8; font-family: monospace; font-weight: bold; letter-spacing: 0.5px; }
+.status-message { font-style: italic; color: #a3a3a8; font-size: 2.2rem; margin: 40px 0; }
+.hidden { display: none !important; }
+
+/* Portrait Overrides */
+.weather-card.portrait { max-width: 500px; padding-bottom: 110px; } /* Increased padding bottom for stacked actions room */
+.weather-card.portrait #weather-content { flex-direction: column; gap: 30px; }
+.weather-card.portrait .forecast-section { width: 100%; }
+.weather-card.portrait .forecast-grid { grid-template-columns: 1fr !important; gap: 10px !important; margin-bottom: 0; }
+.weather-card.portrait .forecast-day { flex-direction: row !important; justify-content: space-between; padding: 15px 30px; }
+.weather-card.portrait .graph-section { display: none; }
+.weather-card.portrait .action-bar-right { bottom: 55px; left: 20px; right: auto; } /* Shifts the update button stack nicely in portrait */

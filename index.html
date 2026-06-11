@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Weather Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="hub-time" class="hub-clock">12:00 PM</div>
+    <div class="weather-card" id="weather-card">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search city..." value="Indio">
+            <button id="search-btn">Search</button>
+        </div>
+        <div id="status" class="status-message">Connecting to weather satellites...</div>
+        <div id="weather-content" class="hidden">
+            <div class="current-section">
+                <h2 id="location">Location</h2>
+                <span id="emoji" class="emoji-icon">☀️</span>
+                <div id="temp" class="temp">--°F</div>
+                <div class="hl">
+                    <span class="hi">H: <span id="high-temp">--</span>°F</span> | 
+                    <span class="lo">L: <span id="low-temp">--</span>°F</span>
+                </div>
+                <div id="desc" class="desc">--</div>
+                <div class="details">
+                    <div>💧 Hum: <span id="humidity">--</span>%</div>
+                    <div>💨 Wind: <span id="wind">--</span> mph</div>
+                </div>
+            </div>
+            <div class="forecast-section">
+                <div class="forecast-title">5-Day Forecast</div>
+                <div id="forecast-container" class="forecast-grid"></div>
+                <div class="graph-section">
+                    <div class="graph-title">Temperature Trend Line</div>
+                    <div class="canvas-container">
+                        <canvas id="line-graph-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="action-bar-left">
+            <button id="fullscreen-btn" class="screen-action-btn">🖥️ Full Screen</button>
+            <button id="layout-btn" class="screen-action-btn">🔄 Rotate Layout</button>
+        </div>
+        <div class="action-bar-right">
+            <span id="timer-display" class="timer-countdown">Refreshes In: 15:00</span>
+            <button id="update-now-btn" class="screen-action-btn update-btn">⚡ Refresh Now</button>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

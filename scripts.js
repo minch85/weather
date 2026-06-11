@@ -8,11 +8,27 @@ document.addEventListener('DOMContentLoaded', () => {
           fsBtn = document.getElementById('fullscreen-btn'),
           lBtn = document.getElementById('layout-btn'),
           tDisp = document.getElementById('timer-display'),
-          uBtn = document.getElementById('update-now-btn');
+          uBtn = document.getElementById('update-now-btn'),
+          clk = document.getElementById('hub-time');
 
     let coords = { lat: 33.72, lon: -116.21, lbl: "INDIO, CA" },
         timeRem = 15 * 60,
         cache = [];
+
+    function extract(arr, idx) { return Array.prototype.at.call(arr, idx); }
+
+    // Safe clock ticker that checks if element exists
+    function tick() { 
+        if (!clk) return;
+        const n = new Date(); 
+        let h = n.getHours(); 
+        const m = String(n.getMinutes()).padStart(2,'0'), 
+              a = h >= 12 ? 'PM' : 'AM'; 
+        h = h % 12 || 12; 
+        clk.textContent = `${h}:${m} ${a}`; 
+    } 
+    setInterval(tick, 1000); 
+    tick(); 
 
     function parseCond(c) { 
         if (c === 0) return { e: "☀️", t: "Clear Sky" }; 
@@ -51,22 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }); 
     } 
 
-    // UNBLOCKED PIPELINE: Uses secure JSON insertion to cleanly bypass Chrome local file system blocks
     async function loadWeather(city) {
-        sDiv.classList.remove('hidden'); 
-        cDiv.classList.add('hidden'); 
-        sDiv.textContent = 'Connecting to weather satellites...'; 
+        if (sDiv) sDiv.classList.remove('hidden'); 
+        if (cDiv) cDiv.classList.add('hidden'); 
+        if (sDiv) sDiv.textContent = 'Connecting to weather satellites...'; 
 
         try {
             const geoRes = await fetch(`https://open-meteo.com{encodeURIComponent(city)}&count=1&language=en&format=json`);
             const geoData = await geoRes.json();
             
             if (!geoData.results || geoData.results.length === 0) {
-                sDiv.textContent = `Location "${city}" not found.`;
+                if (sDiv) sDiv.textContent = `Location "${city}" not found.`;
                 return;
             }
             
-            const loc = geoData.results;
+            const loc = extract(geoData.results, 0);
             const finalLabel = `${loc.name}${loc.admin1 ? ', ' + loc.admin1 : ''}, ${loc.country_code.toUpperCase()}`;
             coords = { lat: loc.latitude, lon: loc.longitude, lbl: finalLabel };
 
@@ -77,61 +92,70 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('location').textContent = finalLabel;
             document.getElementById('emoji').textContent = cc.e;
             document.getElementById('temp').textContent = `${Math.round(d.current.temperature_2m)}°F`;
-            document.getElementById('high-temp').textContent = Math.round(d.daily.temperature_2m_max);
-            document.getElementById('low-temp').textContent = Math.round(d.daily.temperature_2m_min);
+            
+            // Failsafe checks for High/Low template metrics text nodes
+            const hiEl = document.getElementById('high-temp');
+            const loEl = document.getElementById('low-temp');
+            if (hiEl) hiEl.textContent = Math.round(extract(d.daily.temperature_2m_max, 0));
+            if (loEl) loEl.textContent = Math.round(extract(d.daily.temperature_2m_min, 0));
+            
             document.getElementById('desc').textContent = cc.t;
             document.getElementById('humidity').textContent = d.current.relative_humidity_2m;
             document.getElementById('wind').textContent = Math.round(d.current.wind_speed_10m);
 
-            fCon.innerHTML = ''; 
+            if (fCon) fCon.innerHTML = ''; 
             cache = []; 
             const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
             d.daily.time.slice(1, 6).forEach((timeStr, idx) => {
                 const offset = idx + 1;
-                const cd = parseCond(Number(d.daily.weather_code[offset]));
+                const cd = parseCond(Number(extract(d.daily.weather_code, offset)));
                 const safeDate = timeStr.replace(/-/g, '/');
                 const dn = days[new Date(safeDate).getDay()];
-                const mx = Math.round(Number(d.daily.temperature_2m_max[offset]));
-                const mn = Math.round(Number(d.daily.temperature_2m_min[offset]));
+                const mx = Math.round(Number(extract(d.daily.temperature_2m_max, offset)));
+                const mn = Math.round(Number(extract(d.daily.temperature_2m_min, offset)));
                 
                 cache.push({ day: dn, hi: mx, lo: mn });
 
                 const b = document.createElement('div');
                 b.className = 'forecast-day';
                 b.innerHTML = `<div class="day-name">${dn}</div><div class="day-emoji">${cd.e}</div><div class="day-temps">${mx}° / ${mn}°</div>`;
-                fCon.appendChild(b);
+                if (fCon) fCon.appendChild(b);
             });
 
-            setTimeout(() => { if (!card.classList.contains('portrait')) drawGraph(cache); }, 80);
-            sDiv.classList.add('hidden'); 
-            cDiv.classList.remove('hidden'); 
+            setTimeout(() => { if (card && !card.classList.contains('portrait')) drawGraph(cache); }, 80);
+            if (sDiv) sDiv.classList.add('hidden'); 
+            if (cDiv) cDiv.classList.remove('hidden'); 
             timeRem = 15 * 60;
         } catch (e) {
-            sDiv.textContent = "Live Feed Unstable. Move files out of folder or check internet.";
+            if (sDiv) sDiv.textContent = "Live Feed Unstable. Check internet connection.";
         }
     }
 
-    sBtn.addEventListener('click', () => loadWeather(sIn.value)); 
-    sIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') loadWeather(sIn.value); }); 
-    uBtn.addEventListener('click', () => loadWeather(sIn.value || 'Indio')); 
+    if (sBtn) sBtn.addEventListener('click', () => loadWeather(sIn.value)); 
+    if (sIn) sIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') loadWeather(sIn.value); }); 
+    if (uBtn) uBtn.addEventListener('click', () => loadWeather(sIn.value || 'Indio')); 
 
-    lBtn.addEventListener('click', () => { 
-        card.classList.toggle('portrait'); 
-        if (!card.classList.contains('portrait') && cache.length) setTimeout(() => { drawGraph(cache); }, 150); 
-    }); 
+    if (lBtn) {
+        lBtn.addEventListener('click', () => { 
+            card.classList.toggle('portrait'); 
+            if (!card.classList.contains('portrait') && cache.length) setTimeout(() => { drawGraph(cache); }, 150); 
+        }); 
+    }
 
-    fsBtn.addEventListener('click', () => { 
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); 
-        else document.exitFullscreen(); 
-        setTimeout(() => { if (cache.length) drawGraph(cache); }, 150); 
-    }); 
+    if (fsBtn) {
+        fsBtn.addEventListener('click', () => { 
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); 
+            else document.exitFullscreen(); 
+            setTimeout(() => { if (cache.length) drawGraph(cache); }, 150); 
+        }); 
+    }
 
     setInterval(() => { 
         timeRem--; 
         if (timeRem <= 0) { timeRem = 15 * 60; loadWeather(sIn.value || 'Indio'); } 
         const mins = Math.floor(timeRem / 60), secs = String(timeRem % 60).padStart(2, '0'); 
-        tDisp.textContent = `Refreshes In: ${mins}:${secs}`; 
+        if (tDisp) tDisp.textContent = `Refreshes In: ${mins}:${secs}`; 
     }, 1000); 
 
     loadWeather('Indio'); 
